@@ -1,66 +1,60 @@
 /**
  * MODELO: Clase
- * Representa un tipo de clase del gimnasio (yoga, spinning, etc.)
- * Solo maneja datos y lógica de negocio, no imprime nada.
+ * Maneja toda la lógica de negocio de las clases
+ * y la comunicación con la base de datos MySQL.
  */
 
+const { obtenerConexion } = require('../patrones/Singleton');
+
 class Clase {
-  constructor(id, nombre, descripcion, duracionMinutos) {
-    this.id = id;
-    this.nombre = nombre;                     // Ej: "Yoga"
-    this.descripcion = descripcion;           // Ej: "Clase de relajación"
-    this.duracionMinutos = duracionMinutos;   // Ej: 60
-    this.turnos = [];                         // Lista de IDs de turnos asociados
-    this.activa = true;                       // Si la clase está disponible
+
+  // ─── MÉTODOS CON BASE DE DATOS ───────────────────────────────
+
+  // Obtiene todas las clases activas
+  static async obtenerTodas() {
+    const db = await obtenerConexion();
+    const [clases] = await db.execute(
+      'SELECT * FROM clases WHERE activa = 1'
+    );
+    return clases;
   }
 
-  // Agrega un turno a esta clase
-  agregarTurno(turnoId) {
-    if (this.turnos.includes(turnoId)) {
-      throw new Error(`El turno ${turnoId} ya está asignado a esta clase`);
+  // Obtiene una clase por ID
+  static async obtenerPorId(id) {
+    const db = await obtenerConexion();
+    const [rows] = await db.execute(
+      'SELECT * FROM clases WHERE id = ?', [id]
+    );
+    if (rows.length === 0) {
+      throw new Error(`Clase con ID ${id} no encontrada`);
     }
-    this.turnos.push(turnoId);
-    return true;
+    return rows[0];
   }
 
-  // Elimina un turno de esta clase
-  quitarTurno(turnoId) {
-    const index = this.turnos.indexOf(turnoId);
-    if (index === -1) {
-      throw new Error(`El turno ${turnoId} no está asignado a esta clase`);
+  // Desactiva una clase
+  static async desactivar(id) {
+    const db = await obtenerConexion();
+    const clase = await Clase.obtenerPorId(id);
+    if (!clase.activa) {
+      throw new Error(`La clase ${clase.nombre} ya está desactivada`);
     }
-    this.turnos.splice(index, 1);
-    return true;
+    await db.execute(
+      'UPDATE clases SET activa = 0 WHERE id = ?', [id]
+    );
+    return { mensaje: `Clase ${clase.nombre} desactivada` };
   }
 
-  // Desactiva la clase (no la elimina)
-  desactivar() {
-    if (!this.activa) {
-      throw new Error(`La clase ${this.nombre} ya está desactivada`);
+  // Activa una clase
+  static async activar(id) {
+    const db = await obtenerConexion();
+    const clase = await Clase.obtenerPorId(id);
+    if (clase.activa) {
+      throw new Error(`La clase ${clase.nombre} ya está activa`);
     }
-    this.activa = false;
-    return true;
-  }
-
-  // Activa la clase
-  activar() {
-    if (this.activa) {
-      throw new Error(`La clase ${this.nombre} ya está activa`);
-    }
-    this.activa = true;
-    return true;
-  }
-
-  // Devuelve info de la clase como objeto plano (para la Vista)
-  toJSON() {
-    return {
-      id: this.id,
-      nombre: this.nombre,
-      descripcion: this.descripcion,
-      duracionMinutos: this.duracionMinutos,
-      cantidadTurnos: this.turnos.length,
-      activa: this.activa,
-    };
+    await db.execute(
+      'UPDATE clases SET activa = 1 WHERE id = ?', [id]
+    );
+    return { mensaje: `Clase ${clase.nombre} activada` };
   }
 }
 
