@@ -1,192 +1,216 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gran Fortaleza — Panel de Administración</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gimnasio Gran Fortaleza</title>
   <style>
-    :root {
-      --negro: #0a0a0a;
-      --blanco: #f5f5f0;
-      --rojo: #e63329;
-      --gris: #e8e8e3;
-      --gris-medio: #c0c0b8;
-      --gris-texto: #6b6b65;
-      --verde: #2a7d4f;
-      --verde-claro: #e8f5ee;
-      --rojo-claro: #fdecea;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+    header {
+      background: #1a1a2e; color: white;
+      padding: 1rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--blanco); color: var(--negro); min-height: 100vh; }
-    header { background: var(--negro); padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; }
-    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--blanco); letter-spacing: 2px; }
-    .logo span { color: var(--rojo); }
-    .header-badge { background: var(--rojo); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.8rem; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
-    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
-    .seccion { margin-bottom: 2.5rem; border: 1.5px solid var(--gris); border-radius: 4px; overflow: hidden; }
-    .seccion-header { background: var(--negro); color: var(--blanco); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
-    .seccion-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; }
-    .seccion-numero { background: var(--rojo); color: white; width: 28px; height: 28px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
-    .seccion-body { padding: 1.5rem; }
+    header h1 { font-size: 1.4rem; }
+
+    main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+
+    h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 0.3rem; }
+
+    section { background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+    /* Tabla de turnos */
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    thead tr { background: var(--gris); border-bottom: 2px solid var(--negro); }
-    th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gris-texto); }
-    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--gris); vertical-align: middle; }
+    th { background: #1a1a2e; color: white; padding: 0.6rem 0.8rem; text-align: left; }
+    td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #eee; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f9f9f6; }
-    .horario { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--rojo); letter-spacing: 1px; }
-    .clase-nombre { background: var(--gris); padding: 0.2rem 0.6rem; border-radius: 2px; font-size: 0.8rem; font-weight: 500; }
-    .disponibilidad { display: flex; align-items: center; gap: 0.5rem; }
-    .barra-container { width: 80px; height: 6px; background: var(--gris); border-radius: 3px; overflow: hidden; }
-    .barra-fill { height: 100%; border-radius: 3px; background: var(--verde); }
-    .barra-fill.lleno { background: var(--rojo); }
-    .barra-fill.medio { background: #e6a817; }
-    .lugares-texto { font-size: 0.82rem; color: var(--gris-texto); white-space: nowrap; }
-    .tag-lleno { background: var(--rojo-claro); color: var(--rojo); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 2px; }
-    .formularios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 700px) { .formularios-grid { grid-template-columns: 1fr; } }
-    .form-card { border: 1.5px solid var(--gris); border-radius: 4px; overflow: hidden; }
-    .form-card-header { padding: 0.9rem 1.2rem; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem; }
-    .form-card-header.reservar { background: var(--verde-claro); color: var(--verde); border-bottom: 1.5px solid #c3e6d3; }
-    .form-card-header.cancelar { background: var(--rojo-claro); color: var(--rojo); border-bottom: 1.5px solid #f5c6c3; }
-    .form-card-body { padding: 1.2rem; }
-    .campo { margin-bottom: 1rem; }
-    .campo label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gris-texto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
-    .campo input, .campo select { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid var(--gris-medio); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: white; color: var(--negro); outline: none; }
-    .campo input:focus, .campo select:focus { border-color: var(--negro); }
-    .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 3px; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; }
-    .btn-reservar { background: var(--verde); color: white; }
-    .btn-cancelar { background: var(--rojo); color: white; }
-    #mensaje { display: none; padding: 0.9rem 1.2rem; border-radius: 3px; font-size: 0.88rem; font-weight: 500; margin-bottom: 1.5rem; border-left: 4px solid; }
-    #mensaje.ok { background: var(--verde-claro); color: var(--verde); border-color: var(--verde); }
-    #mensaje.error { background: var(--rojo-claro); color: var(--rojo); border-color: var(--rojo); }
-    footer { text-align: center; padding: 2rem; color: var(--gris-medio); font-size: 0.8rem; border-top: 1px solid var(--gris); margin-top: 1rem; }
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem;
+      border-radius: 12px; font-size: 0.78rem; font-weight: bold;
+    }
+    .badge-ok  { background: #d4edda; color: #155724; }
+    .badge-no  { background: #f8d7da; color: #721c24; }
+
+    /* Formularios */
+    form { display: grid; gap: 0.8rem; }
+    label { font-size: 0.88rem; font-weight: bold; }
+    input, select {
+      width: 100%; padding: 0.5rem 0.7rem;
+      border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem; border: none; border-radius: 4px;
+      cursor: pointer; font-size: 0.9rem; font-weight: bold;
+    }
+    .btn-primary   { background: #1a1a2e; color: white; }
+    .btn-danger    { background: #c0392b; color: white; }
+    button:hover   { opacity: 0.85; }
+
+    /* Mensajes */
+    #mensaje {
+      padding: 0.8rem 1rem; border-radius: 4px;
+      font-size: 0.9rem; display: none; margin-bottom: 1rem;
+    }
+    .msg-ok  { background: #d4edda; color: #155724; display: block !important; }
+    .msg-err { background: #f8d7da; color: #721c24; display: block !important; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
+
 <header>
-  <div class="logo">Gran <span>Fortaleza</span></div>
-  <div class="header-badge">Panel Admin</div>
+  <span style="font-size:1.8rem">🏋️</span>
+  <h1>Gimnasio Gran Fortaleza — Panel del Administrador</h1>
 </header>
+
 <main>
+
+  <!-- Mensaje global de feedback -->
   <div id="mensaje"></div>
-  <div class="seccion">
-    <div class="seccion-header">
-      <div class="seccion-numero">1</div>
-      <h2>Turnos Disponibles</h2>
-    </div>
-    <div class="seccion-body">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>Día</th><th>Horario</th><th>Clase</th><th>Disponibilidad</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-turnos">
-          <tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:2rem">Cargando turnos...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="seccion">
-    <div class="seccion-header">
-      <div class="seccion-numero">2</div>
-      <h2>Gestión de Reservas</h2>
-    </div>
-    <div class="seccion-body">
-      <div class="formularios-grid">
-        <div class="form-card">
-          <div class="form-card-header reservar">✓ &nbsp;Confirmar Reserva</div>
-          <div class="form-card-body">
-            <div class="campo"><label>Nombre del Socio</label><input type="text" id="res-nombre" placeholder="Ej: Juan Pérez"></div>
-            <div class="campo"><label>Turno</label><select id="res-turno"><option value="">Seleccionar turno...</option></select></div>
-            <div class="campo"><label>Fecha</label><input type="date" id="res-fecha"></div>
-            <button class="btn btn-reservar" onclick="reservar()">Confirmar Reserva</button>
-          </div>
+
+  <!-- Turnos disponibles -->
+  <section>
+    <h2>Turnos disponibles</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Clase</th><th>Día</th><th>Hora</th><th>Capacidad</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% turnos.forEach(turno => { %>
+        <tr>
+          <td><%= turno.id %></td>
+          <td><%= turno.clase || '—' %></td>
+          <td><%= turno.dia %></td>
+          <td><%= turno.hora %></td>
+          <td><%= turno.capacidad %></td>
+          <td>
+            <% if (turno.capacidad > 0) { %>
+              <span class="badge badge-ok">Disponible</span>
+            <% } else { %>
+              <span class="badge badge-no">Lleno</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (turnos.length === 0) { %>
+          <tr><td colspan="6" style="text-align:center;color:#999">No hay turnos cargados</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="grid-2">
+
+    <!-- Formulario: Reservar -->
+    <section>
+      <h2>Nueva reserva</h2>
+      <form id="formReservar">
+        <div>
+          <label for="nombreSocio">Nombre del socio</label>
+          <input type="text" id="nombreSocio" placeholder="Ej: Juan Pérez" required />
         </div>
-        <div class="form-card">
-          <div class="form-card-header cancelar">✕ &nbsp;Cancelar Reserva</div>
-          <div class="form-card-body">
-            <div class="campo"><label>Nombre del Socio</label><input type="text" id="can-nombre" placeholder="Ej: Juan Pérez"></div>
-            <div class="campo"><label>Turno</label><select id="can-turno"><option value="">Seleccionar turno...</option></select></div>
-            <div class="campo"><label>Fecha</label><input type="date" id="can-fecha"></div>
-            <button class="btn btn-cancelar" onclick="cancelar()">Cancelar Reserva</button>
-          </div>
+        <div>
+          <label for="turnoId">Turno</label>
+          <select id="turnoId" required>
+            <option value="">— Seleccioná un turno —</option>
+            <% turnos.forEach(turno => { %>
+              <option value="<%= turno.id %>">
+                <%= turno.dia %> <%= turno.hora %> (<%= turno.clase || 'Sin clase' %>)
+              </option>
+            <% }) %>
+          </select>
         </div>
-      </div>
-    </div>
+        <div>
+          <label for="fechaReserva">Fecha</label>
+          <input type="date" id="fechaReserva" required />
+        </div>
+        <button type="submit" class="btn-primary">Confirmar reserva</button>
+      </form>
+    </section>
+
+    <!-- Formulario: Cancelar -->
+    <section>
+      <h2>Cancelar reserva</h2>
+      <form id="formCancelar">
+        <div>
+          <label for="reservaId">ID de la reserva</label>
+          <input type="number" id="reservaId" placeholder="Ej: 5" required />
+        </div>
+        <div>
+          <label for="socioId">ID del socio</label>
+          <input type="number" id="socioId" placeholder="Ej: 3" required />
+        </div>
+        <button type="submit" class="btn-danger">Cancelar reserva</button>
+      </form>
+    </section>
+
   </div>
+
 </main>
-<footer>Gimnasio Gran Fortaleza &mdash; Panel de Administración</footer>
+
 <script>
-  async function cargarTurnos() {
-    try {
-      const res = await fetch('/turnos');
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.mensaje);
-      const tbody = document.getElementById('tabla-turnos');
-      const selRes = document.getElementById('res-turno');
-      const selCan = document.getElementById('can-turno');
-      tbody.innerHTML = '';
-      selRes.innerHTML = '<option value="">Seleccionar turno...</option>';
-      selCan.innerHTML = '<option value="">Seleccionar turno...</option>';
-      data.data.forEach(turno => {
-        const disponibles = turno.capacidad_maxima - turno.ocupados;
-        const porcentaje = (turno.ocupados / turno.capacidad_maxima) * 100;
-        const claseColor = porcentaje >= 100 ? 'lleno' : porcentaje >= 60 ? 'medio' : '';
-        tbody.innerHTML += `<tr>
-          <td style="color:var(--gris-texto);font-size:0.85rem">#${turno.id}</td>
-          <td><strong>${turno.dia}</strong></td>
-          <td><span class="horario">${turno.horario}</span></td>
-          <td><span class="clase-nombre">${turno.clase_nombre || '—'}</span></td>
-          <td>${porcentaje >= 100
-            ? '<span class="tag-lleno">LLENO</span>'
-            : `<div class="disponibilidad"><div class="barra-container"><div class="barra-fill ${claseColor}" style="width:${porcentaje}%"></div></div><span class="lugares-texto">${disponibles} / ${turno.capacidad_maxima}</span></div>`
-          }</td></tr>`;
-        const opcion = `<option value="${turno.id}">${turno.dia} ${turno.horario} — ${turno.clase_nombre || 'Sin clase'}</option>`;
-        selRes.innerHTML += opcion;
-        selCan.innerHTML += opcion;
-      });
-    } catch (error) {
-      mostrarMensaje('Error al cargar los turnos: ' + error.message, false);
-    }
-  }
-  async function reservar() {
-    const nombre = document.getElementById('res-nombre').value.trim();
-    const turnoId = document.getElementById('res-turno').value;
-    const fecha = document.getElementById('res-fecha').value;
-    if (!nombre || !turnoId || !fecha) { mostrarMensaje('Completá todos los campos para reservar.', false); return; }
-    try {
-      const res = await fetch('/turnos/reservar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ turnoId, nombreSocio: nombre, fecha }) });
-      const data = await res.json();
-      mostrarMensaje(data.mensaje, data.ok);
-      if (data.ok) cargarTurnos();
-    } catch (error) { mostrarMensaje('Error al reservar: ' + error.message, false); }
-  }
-  async function cancelar() {
-    const nombre = document.getElementById('can-nombre').value.trim();
-    const turnoId = document.getElementById('can-turno').value;
-    const fecha = document.getElementById('can-fecha').value;
-    if (!nombre || !turnoId || !fecha) { mostrarMensaje('Completá todos los campos para cancelar.', false); return; }
-    try {
-      const res = await fetch('/turnos/cancelar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ turnoId, nombreSocio: nombre, fecha }) });
-      const data = await res.json();
-      mostrarMensaje(data.mensaje, data.ok);
-      if (data.ok) cargarTurnos();
-    } catch (error) { mostrarMensaje('Error al cancelar: ' + error.message, false); }
-  }
-  function mostrarMensaje(texto, exito) {
+  function mostrarMensaje(texto, tipo) {
     const el = document.getElementById('mensaje');
     el.textContent = texto;
-    el.className = exito ? 'ok' : 'error';
-    el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 4000);
+    el.className = tipo === 'ok' ? 'msg-ok' : 'msg-err';
+    setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 4000);
   }
-  const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('res-fecha').value = hoy;
-  document.getElementById('can-fecha').value = hoy;
-  cargarTurnos();
+
+  // Reservar
+  document.getElementById('formReservar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombreSocio').value.trim();
+    const turnoId = document.getElementById('turnoId').value;
+    const fecha   = document.getElementById('fechaReserva').value;
+
+    try {
+      const res  = await fetch('/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, turnoId, fecha })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        mostrarMensaje('✅ Reserva confirmada correctamente', 'ok');
+        e.target.reset();
+      } else {
+        mostrarMensaje('❌ ' + data.error, 'err');
+      }
+    } catch {
+      mostrarMensaje('❌ Error de conexión con el servidor', 'err');
+    }
+  });
+
+  // Cancelar
+  document.getElementById('formCancelar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const reservaId = document.getElementById('reservaId').value;
+    const socioId   = document.getElementById('socioId').value;
+
+    try {
+      const res  = await fetch('/reservas/' + reservaId, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ socioId })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        mostrarMensaje('✅ Reserva cancelada correctamente', 'ok');
+        e.target.reset();
+      } else {
+        mostrarMensaje('❌ ' + data.error, 'err');
+      }
+    } catch {
+      mostrarMensaje('❌ Error de conexión con el servidor', 'err');
+    }
+  });
 </script>
+
 </body>
 </html>
