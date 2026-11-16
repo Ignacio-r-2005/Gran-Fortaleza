@@ -77,6 +77,34 @@ class TurnoController {
       res.status(500).json({ ok: false, mensaje: error.message });
     }
   }
+
+async obtenerReservas(req, res) {
+    try {
+      const db = await (require('../patrones/Singleton')).obtenerConexion();
+      const [reservas] = await db.execute(`
+        SELECT r.id, r.nombre_socio, r.fecha_reserva,
+               t.dia, t.horario, c.nombre as clase
+        FROM reservas r
+        JOIN turnos t ON r.turno_id = t.id
+        LEFT JOIN clases c ON t.clase_id = c.id
+        ORDER BY r.fecha_reserva DESC
+      `);
+      res.json({ ok: true, data: reservas });
+    } catch (error) {
+      res.status(500).json({ ok: false, mensaje: error.message });
+    }
+  }
+
+  async eliminarReserva(req, res) {
+    try {
+      const db = await (require('../patrones/Singleton')).obtenerConexion();
+      await db.execute('DELETE FROM reservas WHERE id = ?', [req.params.id]);
+      res.json({ ok: true, mensaje: 'Reserva eliminada' });
+    } catch (error) {
+      res.status(500).json({ ok: false, mensaje: error.message });
+    }
+  }
 }
+
 
 module.exports = TurnoController;

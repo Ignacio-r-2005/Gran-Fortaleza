@@ -1,216 +1,406 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gimnasio Gran Fortaleza</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gran Fortaleza — Panel de Administración</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
-
-    header {
-      background: #1a1a2e; color: white;
-      padding: 1rem 2rem;
-      display: flex; align-items: center; gap: 1rem;
+    :root {
+      --negro: #0a0a0a;
+      --blanco: #f5f5f0;
+      --rojo: #e63329;
+      --gris: #e8e8e3;
+      --gris-medio: #c0c0b8;
+      --gris-texto: #6b6b65;
+      --verde: #2a7d4f;
+      --verde-claro: #e8f5ee;
+      --rojo-claro: #fdecea;
+      --azul: #1a6bbf;
+      --azul-claro: #e8f0fb;
     }
-    header h1 { font-size: 1.4rem; }
-
-    main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-
-    h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a2e; border-bottom: 2px solid #1a1a2e; padding-bottom: 0.3rem; }
-
-    section { background: white; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-
-    /* Tabla de turnos */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--blanco); color: var(--negro); min-height: 100vh; }
+    header { background: var(--negro); padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--blanco); letter-spacing: 2px; }
+    .logo span { color: var(--rojo); }
+    .header-badge { background: var(--rojo); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.8rem; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+    .seccion { margin-bottom: 2.5rem; border: 1.5px solid var(--gris); border-radius: 4px; overflow: hidden; }
+    .seccion-header { background: var(--negro); color: var(--blanco); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
+    .seccion-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; }
+    .seccion-numero { background: var(--rojo); color: white; width: 28px; height: 28px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .seccion-body { padding: 1.5rem; }
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th { background: #1a1a2e; color: white; padding: 0.6rem 0.8rem; text-align: left; }
-    td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #eee; }
+    thead tr { background: var(--gris); border-bottom: 2px solid var(--negro); }
+    th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gris-texto); }
+    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--gris); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
-    .badge {
-      display: inline-block; padding: 0.2rem 0.6rem;
-      border-radius: 12px; font-size: 0.78rem; font-weight: bold;
-    }
-    .badge-ok  { background: #d4edda; color: #155724; }
-    .badge-no  { background: #f8d7da; color: #721c24; }
-
-    /* Formularios */
-    form { display: grid; gap: 0.8rem; }
-    label { font-size: 0.88rem; font-weight: bold; }
-    input, select {
-      width: 100%; padding: 0.5rem 0.7rem;
-      border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;
-    }
-    button {
-      padding: 0.6rem 1.2rem; border: none; border-radius: 4px;
-      cursor: pointer; font-size: 0.9rem; font-weight: bold;
-    }
-    .btn-primary   { background: #1a1a2e; color: white; }
-    .btn-danger    { background: #c0392b; color: white; }
-    button:hover   { opacity: 0.85; }
-
-    /* Mensajes */
-    #mensaje {
-      padding: 0.8rem 1rem; border-radius: 4px;
-      font-size: 0.9rem; display: none; margin-bottom: 1rem;
-    }
-    .msg-ok  { background: #d4edda; color: #155724; display: block !important; }
-    .msg-err { background: #f8d7da; color: #721c24; display: block !important; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    tr:hover td { background: #f9f9f6; }
+    .horario { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--rojo); letter-spacing: 1px; }
+    .clase-nombre { background: var(--gris); padding: 0.2rem 0.6rem; border-radius: 2px; font-size: 0.8rem; font-weight: 500; }
+    .disponibilidad { display: flex; align-items: center; gap: 0.5rem; }
+    .barra-container { width: 80px; height: 6px; background: var(--gris); border-radius: 3px; overflow: hidden; }
+    .barra-fill { height: 100%; border-radius: 3px; background: var(--verde); }
+    .barra-fill.lleno { background: var(--rojo); }
+    .barra-fill.medio { background: #e6a817; }
+    .lugares-texto { font-size: 0.82rem; color: var(--gris-texto); white-space: nowrap; }
+    .tag-lleno { background: var(--rojo-claro); color: var(--rojo); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 2px; }
+    .dos-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .una-columna { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (max-width: 700px) { .dos-columnas { grid-template-columns: 1fr; } }
+    .form-card { border: 1.5px solid var(--gris); border-radius: 4px; overflow: hidden; }
+    .form-card-header { padding: 0.9rem 1.2rem; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-card-header.reservar { background: var(--verde-claro); color: var(--verde); border-bottom: 1.5px solid #c3e6d3; }
+    .form-card-header.cancelar { background: var(--rojo-claro); color: var(--rojo); border-bottom: 1.5px solid #f5c6c3; }
+    .form-card-header.registrar { background: var(--azul-claro); color: var(--azul); border-bottom: 1.5px solid #b3cff0; }
+    .form-card-body { padding: 1.2rem; }
+    .campo { margin-bottom: 1rem; }
+    .campo label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gris-texto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+    .campo input, .campo select { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid var(--gris-medio); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: white; color: var(--negro); outline: none; }
+    .campo input:focus, .campo select:focus { border-color: var(--negro); }
+    .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 3px; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; }
+    .btn-reservar { background: var(--verde); color: white; }
+    .btn-registrar { background: var(--azul); color: white; }
+    .btn-sm { padding: 0.3rem 0.7rem; border: none; border-radius: 3px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+    .btn-editar { background: var(--azul-claro); color: var(--azul); }
+    .btn-eliminar { background: var(--rojo-claro); color: var(--rojo); margin-left: 0.4rem; }
+    .acciones { display: flex; gap: 0.4rem; }
+    #mensaje { display: none; padding: 0.9rem 1.2rem; border-radius: 3px; font-size: 0.88rem; font-weight: 500; margin-bottom: 1.5rem; border-left: 4px solid; }
+    #mensaje.ok { background: var(--verde-claro); color: var(--verde); border-color: var(--verde); }
+    #mensaje.error { background: var(--rojo-claro); color: var(--rojo); border-color: var(--rojo); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.activo { display: flex; }
+    .modal { background: white; border-radius: 4px; padding: 2rem; width: 400px; max-width: 90%; }
+    .modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 1.5rem; }
+    .modal-botones { display: flex; gap: 0.8rem; margin-top: 1rem; }
+    .modal-botones button { flex: 1; padding: 0.7rem; border: none; border-radius: 3px; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 1px; cursor: pointer; }
+    .btn-guardar { background: var(--azul); color: white; }
+    .btn-cerrar { background: var(--gris); color: var(--negro); }
+    footer { text-align: center; padding: 2rem; color: var(--gris-medio); font-size: 0.8rem; border-top: 1px solid var(--gris); margin-top: 1rem; }
   </style>
 </head>
 <body>
 
 <header>
-  <span style="font-size:1.8rem">🏋️</span>
-  <h1>Gimnasio Gran Fortaleza — Panel del Administrador</h1>
+  <div class="logo">Gran <span>Fortaleza</span></div>
+  <div class="header-badge">Panel Admin</div>
 </header>
 
-<main>
+<!-- MODAL EDITAR SOCIO -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal">
+    <h3>Editar Socio</h3>
+    <input type="hidden" id="edit-id">
+    <div class="campo"><label>Nombre</label><input type="text" id="edit-nombre"></div>
+    <div class="campo"><label>Email</label><input type="email" id="edit-email"></div>
+    <div class="campo"><label>Teléfono</label><input type="text" id="edit-telefono"></div>
+    <div class="modal-botones">
+      <button class="btn-cerrar" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-guardar" onclick="guardarEdicion()">Guardar</button>
+    </div>
+  </div>
+</div>
 
-  <!-- Mensaje global de feedback -->
+<main>
   <div id="mensaje"></div>
 
-  <!-- Turnos disponibles -->
-  <section>
-    <h2>Turnos disponibles</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th><th>Clase</th><th>Día</th><th>Hora</th><th>Capacidad</th><th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% turnos.forEach(turno => { %>
-        <tr>
-          <td><%= turno.id %></td>
-          <td><%= turno.clase || '—' %></td>
-          <td><%= turno.dia %></td>
-          <td><%= turno.hora %></td>
-          <td><%= turno.capacidad %></td>
-          <td>
-            <% if (turno.capacidad > 0) { %>
-              <span class="badge badge-ok">Disponible</span>
-            <% } else { %>
-              <span class="badge badge-no">Lleno</span>
-            <% } %>
-          </td>
-        </tr>
-        <% }) %>
-        <% if (turnos.length === 0) { %>
-          <tr><td colspan="6" style="text-align:center;color:#999">No hay turnos cargados</td></tr>
-        <% } %>
-      </tbody>
-    </table>
-  </section>
+  <!-- SECCIÓN 1: TURNOS -->
+  <div class="seccion">
+    <div class="seccion-header">
+      <div class="seccion-numero">1</div>
+      <h2>Turnos Disponibles</h2>
+    </div>
+    <div class="seccion-body">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Día</th><th>Horario</th><th>Clase</th><th>Disponibilidad</th></tr>
+        </thead>
+        <tbody id="tabla-turnos">
+          <tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:2rem">Cargando turnos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  <div class="grid-2">
+  <!-- SECCIÓN 2: RESERVAS -->
+  <div class="seccion">
+    <div class="seccion-header">
+      <div class="seccion-numero">2</div>
+      <h2>Gestión de Reservas</h2>
+    </div>
+    <div class="seccion-body">
+      <div class="dos-columnas" style="margin-bottom:1.5rem">
 
-    <!-- Formulario: Reservar -->
-    <section>
-      <h2>Nueva reserva</h2>
-      <form id="formReservar">
-        <div>
-          <label for="nombreSocio">Nombre del socio</label>
-          <input type="text" id="nombreSocio" placeholder="Ej: Juan Pérez" required />
+        <!-- CONFIRMAR RESERVA -->
+        <div class="form-card">
+          <div class="form-card-header reservar">✓ &nbsp;Confirmar Reserva</div>
+          <div class="form-card-body">
+            <div class="campo">
+              <label>Socio</label>
+              <select id="res-socio"><option value="">Seleccionar socio...</option></select>
+            </div>
+            <div class="campo">
+              <label>Turno</label>
+              <select id="res-turno"><option value="">Seleccionar turno...</option></select>
+            </div>
+            <div class="campo"><label>Fecha</label><input type="date" id="res-fecha"></div>
+            <button class="btn btn-reservar" onclick="reservar()">Confirmar Reserva</button>
+          </div>
         </div>
-        <div>
-          <label for="turnoId">Turno</label>
-          <select id="turnoId" required>
-            <option value="">— Seleccioná un turno —</option>
-            <% turnos.forEach(turno => { %>
-              <option value="<%= turno.id %>">
-                <%= turno.dia %> <%= turno.hora %> (<%= turno.clase || 'Sin clase' %>)
-              </option>
-            <% }) %>
-          </select>
-        </div>
-        <div>
-          <label for="fechaReserva">Fecha</label>
-          <input type="date" id="fechaReserva" required />
-        </div>
-        <button type="submit" class="btn-primary">Confirmar reserva</button>
-      </form>
-    </section>
 
-    <!-- Formulario: Cancelar -->
-    <section>
-      <h2>Cancelar reserva</h2>
-      <form id="formCancelar">
-        <div>
-          <label for="reservaId">ID de la reserva</label>
-          <input type="number" id="reservaId" placeholder="Ej: 5" required />
-        </div>
-        <div>
-          <label for="socioId">ID del socio</label>
-          <input type="number" id="socioId" placeholder="Ej: 3" required />
-        </div>
-        <button type="submit" class="btn-danger">Cancelar reserva</button>
-      </form>
-    </section>
+        <!-- ESPACIO VACÍO para mantener el grid -->
+        <div></div>
 
+      </div>
+
+      <!-- TABLA DE RESERVAS ACTIVAS (ancho completo) -->
+      <div class="form-card">
+        <div class="form-card-header cancelar">✕ &nbsp;Reservas Activas</div>
+        <div class="form-card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr><th>Socio</th><th>Día</th><th>Horario</th><th>Clase</th><th>Fecha</th><th>Acción</th></tr>
+            </thead>
+            <tbody id="tabla-reservas">
+              <tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Cargando reservas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: SOCIOS -->
+  <div class="seccion">
+    <div class="seccion-header">
+      <div class="seccion-numero">3</div>
+      <h2>Gestión de Socios</h2>
+    </div>
+    <div class="seccion-body">
+      <div class="dos-columnas">
+        <div class="form-card">
+          <div class="form-card-header registrar">+ &nbsp;Registrar Socio</div>
+          <div class="form-card-body">
+            <div class="campo"><label>Nombre completo</label><input type="text" id="soc-nombre" placeholder="Ej: Juan Pérez"></div>
+            <div class="campo"><label>Email</label><input type="email" id="soc-email" placeholder="Ej: juan@gmail.com"></div>
+            <div class="campo"><label>Teléfono (opcional)</label><input type="text" id="soc-telefono" placeholder="Ej: 3512345678"></div>
+            <button class="btn btn-registrar" onclick="registrarSocio()">Registrar Socio</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-header registrar">👥 &nbsp;Socios Registrados</div>
+          <div class="form-card-body" style="padding:0">
+            <table>
+              <thead>
+                <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="tabla-socios">
+                <tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Cargando socios...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </main>
 
+<footer>Gimnasio Gran Fortaleza &mdash; Panel de Administración</footer>
+
 <script>
-  function mostrarMensaje(texto, tipo) {
-    const el = document.getElementById('mensaje');
-    el.textContent = texto;
-    el.className = tipo === 'ok' ? 'msg-ok' : 'msg-err';
-    setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 4000);
+  async function cargarTurnos() {
+    try {
+      const res = await fetch('/turnos');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.mensaje);
+      const tbody = document.getElementById('tabla-turnos');
+      const selTurno = document.getElementById('res-turno');
+      tbody.innerHTML = '';
+      selTurno.innerHTML = '<option value="">Seleccionar turno...</option>';
+      data.data.forEach(turno => {
+        const disponibles = turno.capacidad_maxima - turno.ocupados;
+        const porcentaje = (turno.ocupados / turno.capacidad_maxima) * 100;
+        const claseColor = porcentaje >= 100 ? 'lleno' : porcentaje >= 60 ? 'medio' : '';
+        tbody.innerHTML += `<tr>
+          <td style="color:var(--gris-texto);font-size:0.85rem">#${turno.id}</td>
+          <td><strong>${turno.dia}</strong></td>
+          <td><span class="horario">${turno.horario}</span></td>
+          <td><span class="clase-nombre">${turno.clase_nombre || '—'}</span></td>
+          <td>${porcentaje >= 100
+            ? '<span class="tag-lleno">LLENO</span>'
+            : `<div class="disponibilidad"><div class="barra-container"><div class="barra-fill ${claseColor}" style="width:${porcentaje}%"></div></div><span class="lugares-texto">${disponibles} / ${turno.capacidad_maxima}</span></div>`
+          }</td></tr>`;
+        selTurno.innerHTML += `<option value="${turno.id}">${turno.dia} ${turno.horario} — ${turno.clase_nombre || 'Sin clase'}</option>`;
+      });
+    } catch (error) {
+      mostrarMensaje('Error al cargar turnos: ' + error.message, false);
+    }
   }
 
-  // Reservar
-  document.getElementById('formReservar').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById('nombreSocio').value.trim();
-    const turnoId = document.getElementById('turnoId').value;
-    const fecha   = document.getElementById('fechaReserva').value;
-
+  async function cargarSocios() {
     try {
-      const res  = await fetch('/reservas', {
+      const res = await fetch('/socios');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      const tbody = document.getElementById('tabla-socios');
+      const selSocio = document.getElementById('res-socio');
+      selSocio.innerHTML = '<option value="">Seleccionar socio...</option>';
+      if (data.socios.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">No hay socios registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      data.socios.forEach(socio => {
+        selSocio.innerHTML += `<option value="${socio.nombre}">${socio.nombre}</option>`;
+        tbody.innerHTML += `<tr>
+          <td><strong>${socio.nombre}</strong></td>
+          <td style="color:var(--gris-texto);font-size:0.85rem">${socio.email}</td>
+          <td style="color:var(--gris-texto);font-size:0.85rem">${socio.telefono || '—'}</td>
+          <td>
+            <div class="acciones">
+              <button class="btn-sm btn-editar" onclick="abrirEditar(${socio.id}, '${socio.nombre}', '${socio.email}', '${socio.telefono || ''}')">Editar</button>
+              <button class="btn-sm btn-eliminar" onclick="eliminarSocio(${socio.id}, '${socio.nombre}')">Eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+      });
+    } catch (error) {
+      mostrarMensaje('Error al cargar socios: ' + error.message, false);
+    }
+  }
+
+  async function cargarReservas() {
+    try {
+      const res = await fetch('/reservas');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.mensaje);
+      const tbody = document.getElementById('tabla-reservas');
+      if (data.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:1.5rem">No hay reservas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      data.data.forEach(r => {
+        tbody.innerHTML += `<tr>
+          <td><strong>${r.nombre_socio}</strong></td>
+          <td>${r.dia}</td>
+          <td><span class="horario">${r.horario}</span></td>
+          <td><span class="clase-nombre">${r.clase || '—'}</span></td>
+          <td style="color:var(--gris-texto);font-size:0.85rem">${r.fecha_reserva.toString().split('T')[0]}</td>
+          <td><button class="btn-sm btn-eliminar" onclick="eliminarReserva(${r.id})">Eliminar</button></td>
+        </tr>`;
+      });
+    } catch (error) {
+      mostrarMensaje('Error al cargar reservas: ' + error.message, false);
+    }
+  }
+
+  async function reservar() {
+    const nombreSocio = document.getElementById('res-socio').value;
+    const turnoId = document.getElementById('res-turno').value;
+    const fecha = document.getElementById('res-fecha').value;
+    if (!nombreSocio || !turnoId || !fecha) { mostrarMensaje('Completá todos los campos.', false); return; }
+    try {
+      const res = await fetch('/turnos/reservar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, turnoId, fecha })
+        body: JSON.stringify({ turnoId, nombreSocio, fecha })
       });
       const data = await res.json();
-      if (data.ok) {
-        mostrarMensaje('✅ Reserva confirmada correctamente', 'ok');
-        e.target.reset();
-      } else {
-        mostrarMensaje('❌ ' + data.error, 'err');
-      }
-    } catch {
-      mostrarMensaje('❌ Error de conexión con el servidor', 'err');
-    }
-  });
+      mostrarMensaje(data.mensaje, data.ok);
+      if (data.ok) { cargarTurnos(); cargarReservas(); }
+    } catch (error) { mostrarMensaje('Error al reservar: ' + error.message, false); }
+  }
 
-  // Cancelar
-  document.getElementById('formCancelar').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const reservaId = document.getElementById('reservaId').value;
-    const socioId   = document.getElementById('socioId').value;
-
+  async function eliminarReserva(id) {
+    if (!confirm('¿Seguro que querés eliminar esta reserva?')) return;
     try {
-      const res  = await fetch('/reservas/' + reservaId, {
-        method: 'DELETE',
+      const res = await fetch(`/reservas/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      mostrarMensaje(data.ok ? data.mensaje : data.mensaje, data.ok);
+      if (data.ok) { cargarReservas(); cargarTurnos(); }
+    } catch (error) { mostrarMensaje('Error: ' + error.message, false); }
+  }
+
+  async function registrarSocio() {
+    const nombre = document.getElementById('soc-nombre').value.trim();
+    const email = document.getElementById('soc-email').value.trim();
+    const telefono = document.getElementById('soc-telefono').value.trim();
+    if (!nombre || !email) { mostrarMensaje('Nombre y email son obligatorios.', false); return; }
+    try {
+      const res = await fetch('/socios/registrar', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ socioId })
+        body: JSON.stringify({ nombre, email, telefono })
       });
       const data = await res.json();
+      mostrarMensaje(data.ok ? `Socio ${nombre} registrado correctamente` : data.error, data.ok);
       if (data.ok) {
-        mostrarMensaje('✅ Reserva cancelada correctamente', 'ok');
-        e.target.reset();
-      } else {
-        mostrarMensaje('❌ ' + data.error, 'err');
+        document.getElementById('soc-nombre').value = '';
+        document.getElementById('soc-email').value = '';
+        document.getElementById('soc-telefono').value = '';
+        cargarSocios();
       }
-    } catch {
-      mostrarMensaje('❌ Error de conexión con el servidor', 'err');
-    }
-  });
-</script>
+    } catch (error) { mostrarMensaje('Error al registrar: ' + error.message, false); }
+  }
 
+  function abrirEditar(id, nombre, email, telefono) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-nombre').value = nombre;
+    document.getElementById('edit-email').value = email;
+    document.getElementById('edit-telefono').value = telefono;
+    document.getElementById('modal-editar').classList.add('activo');
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-editar').classList.remove('activo');
+  }
+
+  async function guardarEdicion() {
+    const id = document.getElementById('edit-id').value;
+    const nombre = document.getElementById('edit-nombre').value.trim();
+    const email = document.getElementById('edit-email').value.trim();
+    const telefono = document.getElementById('edit-telefono').value.trim();
+    if (!nombre || !email) { mostrarMensaje('Nombre y email son obligatorios.', false); return; }
+    try {
+      const res = await fetch(`/socios/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, telefono })
+      });
+      const data = await res.json();
+      mostrarMensaje(data.ok ? 'Socio actualizado correctamente' : data.error, data.ok);
+      if (data.ok) { cerrarModal(); cargarSocios(); }
+    } catch (error) { mostrarMensaje('Error al actualizar: ' + error.message, false); }
+  }
+
+  async function eliminarSocio(id, nombre) {
+    if (!confirm(`¿Seguro que querés eliminar a ${nombre}?`)) return;
+    try {
+      const res = await fetch(`/socios/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      mostrarMensaje(data.ok ? data.mensaje : data.error, data.ok);
+      if (data.ok) cargarSocios();
+    } catch (error) { mostrarMensaje('Error al eliminar: ' + error.message, false); }
+  }
+
+  function mostrarMensaje(texto, exito) {
+    const el = document.getElementById('mensaje');
+    el.textContent = texto;
+    el.className = exito ? 'ok' : 'error';
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('res-fecha').value = hoy;
+
+  cargarTurnos();
+  cargarSocios();
+  cargarReservas();
+</script>
 </body>
 </html>

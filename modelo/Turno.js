@@ -43,8 +43,8 @@ class Turno {
         COUNT(r.id) as ocupados
       FROM turnos t
       LEFT JOIN clases c ON t.clase_id = c.id
-      LEFT JOIN reservas r ON t.id = r.turno_id 
-        AND r.fecha_reserva = CURDATE()
+     LEFT JOIN reservas r ON t.id = r.turno_id 
+  AND r.fecha_reserva >= CURDATE()
       GROUP BY t.id
     `);
     return turnos;
